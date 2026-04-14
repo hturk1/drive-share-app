@@ -140,6 +140,12 @@ def edit_car(car_id):
         ).fetchone()
 
         WatchService().notify_watchers(car)
+
+
+        mediator.system_event(
+            f"{car['model']} updated",
+            [session["user_id"]]
+        )
         return redirect("/my_cars")
 
     return render_template("edit_car.html", car_id=car_id)
@@ -183,7 +189,7 @@ def message(car_id):
     if request.method == "POST":
         text = request.form["text"]
 
-        msg_service.send(
+        mediator.send_message(
             session["user_id"],
             car["owner_id"],
             text
@@ -322,7 +328,7 @@ def reply(to_user_id):
 
     text = request.form["text"]
 
-    msg_service.send(
+    mediator.send_message(
         session["user_id"],
         to_user_id,
         text
@@ -379,6 +385,12 @@ def update_price(car_id):
     ).fetchone()
 
     WatchService().notify_watchers(car)
+
+
+    mediator.system_event(
+        f"{car['model']} updated",
+        [session["user_id"]]
+    )
 
     return redirect("/cars")
 

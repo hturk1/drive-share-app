@@ -87,5 +87,5 @@ class CarService:
         from watch_service import WatchService
         watch_service = WatchService()
 
-        watch_service.notify_watchers(car)
+        watch_service.notify_watchers(car) #once price is change user get notified 
     
