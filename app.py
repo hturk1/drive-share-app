@@ -8,6 +8,16 @@ from payment_service import PaymentService
 from patterns.chain import Q1Handler, Q2Handler, Q3Handler
 from notification_service import NotificationService
 from message_service import MessageService
+from watch_service import WatchService
+from patterns.singleton import SessionSingleton
+from patterns.mediator import Mediator
+
+
+mediator = Mediator(NotificationService())
+
+session_manager = SessionSingleton()
+
+watch_service = WatchService()
 
 msg_service = MessageService()
 
@@ -59,6 +69,7 @@ def login():
 
         if ok:
             session["user_id"] = user["id"]
+            session_manager.user_id = user["id"]
             return redirect("/dashboard")
 
     return render_template("login.html")
@@ -74,7 +85,6 @@ def dashboard():
 
 
 # CARS LIST
-
 @app.route("/cars", methods=["GET"])
 def cars_page():
 
@@ -108,11 +118,13 @@ def add_car():
 
     return render_template("add_car.html")
 
+# MY CARS LIST
 @app.route("/my_cars")
 def my_cars():
     data = cars.get_my_cars(session["user_id"])
     return render_template("my_cars.html", cars=data)
 
+# EDIT CAR
 @app.route("/edit_car/<int:car_id>", methods=["GET", "POST"])
 def edit_car(car_id):
     if request.method == "POST":
@@ -121,6 +133,13 @@ def edit_car(car_id):
             request.form["price"],
             request.form["available"]
         )
+        db = get_db()
+        car = db.execute(
+            "SELECT * FROM cars WHERE id=?",
+            (car_id,)
+        ).fetchone()
+
+        WatchService().notify_watchers(car)
         return redirect("/my_cars")
 
     return render_template("edit_car.html", car_id=car_id)
@@ -155,6 +174,7 @@ def book(car_id):
     )
 
 
+# MESSAGE OWNER
 @app.route("/message/<int:car_id>", methods=["GET", "POST"])
 def message(car_id):
 
@@ -174,8 +194,19 @@ def message(car_id):
     return render_template("message.html", car=car)
 
 
+# VIEW MESSAGES
+@app.route("/messages")
+def messages_page():
+
+    if "user_id" not in session:
+        return redirect("/login")
+
+    data = notifications.get(session["user_id"])
+
+    return render_template("messages.html", messages=data)
 
 
+# PAY ONCE BOOKED
 @app.route("/pay/<int:car_id>")
 def pay(car_id):
 
@@ -187,14 +218,18 @@ def pay(car_id):
 
     result = payment.pay(car["price"])
 
-    notifications.send(
-        car["owner_id"],
-        f"Payment received for {car['model']} (${car['price']})"
+
+
+    mediator.notify(
+        "PAYMENT",
+        f"Payment received for {car['model']} (${car['price']})",
+        car["owner_id"]
     )
 
-    notifications.send(
-        session["user_id"],
-        f"You paid ${car['price']} for {car['model']}"
+    mediator.notify(
+        "PAYMENT",
+        f"You paid ${car['price']} for {car['model']}",
+        session["user_id"]
     )
 
     return render_template(
@@ -203,7 +238,7 @@ def pay(car_id):
         car=car
     )
 
-
+# RECOVER PASSWORD
 @app.route("/recover", methods=["GET", "POST"])
 def recover():
     result = None
@@ -264,15 +299,21 @@ def recover():
         email=email
     )
 
+# VIEW NOTIFICATIONS
 @app.route("/notifications")
 def show_notifications():
 
+    if "user_id" not in session:
+        return redirect("/login")
+    
     user_id = session["user_id"]
 
     data = notifications.get(user_id)
 
     return render_template("notifications.html", notifications=data)
 
+
+# REPLY TO MESSAGES
 @app.route("/reply/<int:to_user_id>", methods=["POST"])
 def reply(to_user_id):
 
@@ -287,8 +328,9 @@ def reply(to_user_id):
         text
     )
 
-    return redirect("/notifications")
+    return redirect("/messages")
 
+# WATCH CAR
 @app.route("/watch/<int:car_id>", methods=["POST"])
 def watch(car_id):
 
@@ -296,14 +338,51 @@ def watch(car_id):
     user_id = session["user_id"]
     max_price = request.form["max_price"]
 
-    db.execute("""
-        INSERT INTO watches (car_id, user_id, max_price)
-        VALUES (?, ?, ?)
-    """, (car_id, user_id, max_price))
+    existing = db.execute("""
+        SELECT * FROM watches
+        WHERE car_id=? AND user_id=?
+    """, (car_id, user_id)).fetchone()
+
+    if existing:
+        db.execute("""
+            UPDATE watches
+            SET max_price=?
+            WHERE car_id=? AND user_id=?
+        """, (max_price, car_id, user_id))
+    else:
+        db.execute("""
+            INSERT INTO watches (car_id, user_id, max_price)
+            VALUES (?, ?, ?)
+        """, (car_id, user_id, max_price))
 
     db.commit()
 
     return redirect("/cars")
+
+# UPDATE PRICE OF CAR
+@app.route("/update_price/<int:car_id>", methods=["POST"])
+def update_price(car_id):
+
+    db = get_db()
+
+    new_price = request.form["price"]
+
+    db.execute("""
+        UPDATE cars SET price=? WHERE id=?
+    """, (new_price, car_id))
+
+    db.commit()
+
+    car = db.execute(
+        "SELECT * FROM cars WHERE id=?",
+        (car_id,)
+    ).fetchone()
+
+    WatchService().notify_watchers(car)
+
+    return redirect("/cars")
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

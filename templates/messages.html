@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Messages</h2>
+
+{% for n in messages %}
+
+    {% if "FROM:" in n.message %}
+        {% set parts = n.message.split("|") %}
+        {% set sender = parts[0].replace("FROM:", "") %}
+        {% set text = parts[1] %}
+
+        <p><b>From User {{ sender }}:</b> {{ text }}</p>
+
+        <form method="POST" action="/reply/{{ sender }}">
+            <input name="text" placeholder="Reply..." required>
+            <button type="submit">Reply</button>
+        </form>
+
+        <hr>
+
+    {% endif %}
+
+{% endfor %}
+
+{% endblock %}

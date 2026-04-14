@@ -1,6 +1,8 @@
 from database import get_db
 from patterns.observer import WatchSubject, WatchObserver
 from notification_service import NotificationService
+from patterns.builder import CarBuilder
+
 
 subject = WatchSubject()
 notifications = NotificationService()
@@ -8,11 +10,30 @@ notifications = NotificationService()
 class CarService:
 
     def add_car(self, owner_id, model, year, mileage, location, price, available):
+
+        car = (CarBuilder()
+            .set_owner(owner_id)
+            .set_model(model)
+            .set_year(year)
+            .set_mileage(mileage)
+            .set_location(location)
+            .set_price(price)
+            .set_available(available)
+            .build())
+
         db = get_db()
         db.execute("""
             INSERT INTO cars(owner_id, model, year, mileage, location, price, available)
             VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (owner_id, model, year, mileage, location, price, available))
+        """, (
+            car.owner_id,
+            car.model,
+            car.year,
+            car.mileage,
+            car.location,
+            car.price,
+            car.available
+        ))
         db.commit()
 
     def get_all_cars(self):

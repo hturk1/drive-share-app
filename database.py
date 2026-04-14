@@ -36,7 +36,7 @@ def init_db():
         available TEXT
     )
     """)
-
+    # BOOKINGS 
     cur.execute("""
     CREATE TABLE IF NOT EXISTS bookings (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -48,6 +48,7 @@ def init_db():
     )
     """)
 
+    # NOTIFACTIONS
     cur.execute("""
     CREATE TABLE IF NOT EXISTS notifications (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -57,6 +58,7 @@ def init_db():
     )
     """)
 
+    # WATCHES
     cur.execute("""
     CREATE TABLE IF NOT EXISTS watches (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

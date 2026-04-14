@@ -18,10 +18,22 @@ class WatchObserver:
         self.max_price = float(max_price)
         self.notifications = notification_service
 
+
     def update(self, car):
 
-        if car["price"] <= self.max_price:
+        price = float(car["price"])
+        available = int(car["available"])
+
+        # Price condition
+        if price <= self.max_price:
             self.notifications.send(
                 self.user_id,
-                f" {car['model']} is now ${car['price']}"
+                f"{car['model']} dropped to ${price}"
+            )
+
+        # Availability condition
+        if available == 1:
+            self.notifications.send(
+                self.user_id,
+                f"{car['model']} is now available!"
             )
