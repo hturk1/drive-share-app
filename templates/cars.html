@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Cars</h2>
+
+<form method="GET">
+    <input name="location" placeholder="Search location">
+    <button type="submit">Search</button>
+</form>
+
+{% for car in cars %}
+<div style="border:1px solid #ccc; padding:10px; margin:10px;">
+    <p>Owner ID: {{ car.owner_id }}</p>
+    <p>Model: {{ car.model }}</p>
+    <p>Year: {{ car.year }}</p>
+    <p>Mileage: {{ car.mileage }}</p>
+    <p>Location: {{ car.location }}</p>
+    <p>Price: ${{ car.price }}</p>
+    <p>Available: {{ car.available }}</p>
+    <a href="/book/{{ car.id }}">
+        <button>Book</button>
+    </a>
+    <form action="/watch/{{ car.id }}" method="POST">
+        <input name="max_price" placeholder="Max price you want">
+        <button>Watch</button>
+    </form>
+</div>
+{% endfor %}
+
+{% endblock %}

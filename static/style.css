@@ -1,0 +1,53 @@
+body {
+    font-family: Arial;
+    background: #f4f6f8;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 60%;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    margin-top: 40px;
+    border-radius: 10px;
+}
+
+button {
+    background: #2d6cdf;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+}
+
+a {
+    text-decoration: none;
+}
+
+h2 {
+    color: #2d6cdf;
+}
+
+.navbar {
+    background: #2d6cdf;
+    padding: 10px;
+}
+
+.navbar a {
+    color: white;
+    margin-right: 15px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.navbar a:hover {
+    text-decoration: underline;
+}

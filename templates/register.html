@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Register</h2>
+
+<form method="POST">
+    Email:<br>
+    <input name="email"><br><br>
+
+    Password:<br>
+    <input name="password" type="password"><br><br>
+
+    What is the name of the highschool you attended?:<br>
+    <input name="q1"><br><br>
+
+    What is the maidan name of your mother?:<br>
+    <input name="q2"><br><br>
+
+    What is the name of your first pet?:<br>
+    <input name="q3"><br><br>
+
+    <button type="submit">Register</button>
+</form>
+{% endblock %}

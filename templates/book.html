@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Booking</h2>
+
+{% if message %}
+<p><b>{{ message }}</b></p>
+{% endif %}
+
+
+<form method="POST">
+    Start Date:<br>
+    <input type="date" name="start_date" required><br><br>
+
+    End Date:<br>
+    <input type="date" name="end_date" required><br><br>
+
+    <button type="submit">Book Car</button>
+</form>
+
+<br>
+
+{% if message and "Booked successfully" in message %}
+    <a href="/pay/{{ car.id }}">
+        <button>Pay Now</button>
+    </a>
+{% else %}
+    <button disabled>Pay Not Available</button>
+{% endif %}
+
+<br><br>
+<a href="/message/{{ car.id }}">
+    <button>Message Owner</button>
+</a>
+
+
+<br><br>
+
+{% endblock %}

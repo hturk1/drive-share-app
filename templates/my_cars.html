@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>My Cars</h2>
+
+<a href="/add_car"><button>Add Car</button></a>
+
+{% for car in cars %}
+<div style="border:1px solid #ccc; padding:10px; margin:10px;">
+
+    <p><b>{{ car.model }}</b></p>
+    <p>Year: {{ car.year }}</p>
+    <p>Mileage: {{ car.mileage }}</p>
+    <p>Location: {{ car.location }}</p>
+    <p>Price: ${{ car.price }}</p>
+    <p>Available: {{ car.available }}</p>
+
+    <a href="/edit_car/{{ car.id }}">
+        <button>Edit</button>
+    </a>
+
+</div>
+{% endfor %}
+
+{% endblock %}

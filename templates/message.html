@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Message Owner</h2>
+
+{% if success %}
+<p style="color:green">{{ success }}</p>
+{% endif %}
+
+<form method="POST">
+    <textarea name="text" placeholder="Write your message..." required></textarea>
+    <br>
+    <button type="submit">Send Message</button>
+</form>
+
+{% endblock %}

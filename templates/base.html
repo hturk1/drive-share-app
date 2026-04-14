@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DriveShare</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <a href="/login">Login</a>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/cars">Cars</a>
+    <a href="/add_car">Add Car</a>
+    <a href="/my_cars">My Cars</a>
+    <a href="/notifications">Notifications</a>
+</div>
+
+<!-- PAGE CONTENT -->
+<div class="container">
+    {% block content %}{% endblock %}
+</div>
+
+</body>
+</html>
